@@ -1,103 +1,467 @@
-import Image from "next/image";
+import type { Metadata } from "next"
+import { Search, MapPin, Building2, Clock, DollarSign, Filter } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Rochester NY Jobs | Find Local Employment Opportunities",
+  description:
+    "Discover the best job opportunities in Rochester, New York. Browse local positions from top employers in the Flower City. Updated daily.",
+  keywords: "Rochester NY jobs, Rochester New York employment, local jobs Rochester, careers Rochester NY",
+  openGraph: {
+    title: "Rochester NY Jobs - Local Employment Opportunities",
+    description: "Find your next career opportunity in Rochester, New York",
+    type: "website",
+  },
+}
+
+// Sample job data - in a real app, this would come from a database
+const jobs = [
+  {
+    id: 1,
+    title: "Senior Software Engineer",
+    company: "Xerox Corporation",
+    location: "Rochester, NY",
+    type: "Full-time",
+    salary: "$85,000 - $120,000",
+    posted: "2 days ago",
+    description: "Join our innovative team developing next-generation printing solutions.",
+    tags: ["JavaScript", "React", "Node.js"],
+    logo: "/placeholder.svg?height=40&width=40",
+  },
+  {
+    id: 2,
+    title: "Marketing Manager",
+    company: "Wegmans Food Markets",
+    location: "Rochester, NY",
+    type: "Full-time",
+    salary: "$65,000 - $85,000",
+    posted: "1 day ago",
+    description: "Lead marketing initiatives for our flagship Rochester locations.",
+    tags: ["Marketing", "Digital Marketing", "Analytics"],
+    logo: "/placeholder.svg?height=40&width=40",
+  },
+  {
+    id: 3,
+    title: "Registered Nurse",
+    company: "Rochester Regional Health",
+    location: "Rochester, NY",
+    type: "Full-time",
+    salary: "$70,000 - $90,000",
+    posted: "3 days ago",
+    description: "Provide exceptional patient care in our state-of-the-art facilities.",
+    tags: ["Healthcare", "Nursing", "Patient Care"],
+    logo: "/placeholder.svg?height=40&width=40",
+  },
+  {
+    id: 4,
+    title: "Data Analyst",
+    company: "University of Rochester",
+    location: "Rochester, NY",
+    type: "Full-time",
+    salary: "$55,000 - $75,000",
+    posted: "4 days ago",
+    description: "Analyze research data and support academic initiatives.",
+    tags: ["Data Analysis", "SQL", "Python"],
+    logo: "/placeholder.svg?height=40&width=40",
+  },
+  {
+    id: 5,
+    title: "Financial Advisor",
+    company: "ESL Federal Credit Union",
+    location: "Rochester, NY",
+    type: "Full-time",
+    salary: "$50,000 - $80,000",
+    posted: "5 days ago",
+    description: "Help members achieve their financial goals with personalized advice.",
+    tags: ["Finance", "Customer Service", "Sales"],
+    logo: "/placeholder.svg?height=40&width=40",
+  },
+  {
+    id: 6,
+    title: "UX Designer",
+    company: "ImageFirst",
+    location: "Rochester, NY",
+    type: "Contract",
+    salary: "$60,000 - $85,000",
+    posted: "1 week ago",
+    description: "Design intuitive user experiences for our digital platforms.",
+    tags: ["UX Design", "Figma", "User Research"],
+    logo: "/placeholder.svg?height=40&width=40",
+  },
+]
+
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-white border-b shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">R</span>
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-400 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">+</span>
+                </div>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  RocJobs
+                </h1>
+                <p className="text-sm text-gray-500 font-medium">The Flower City's Job Hub</p>
+              </div>
+            </div>
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                Browse Jobs
+              </a>
+              <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                Companies
+              </a>
+              <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                Post a Job
+              </a>
+              <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                Sign In
+              </Button>
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                Get Started
+              </Button>
+            </nav>
+          </div>
+        </div>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+          <div className="absolute inset-0 opacity-30">
+            <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <defs>
+                <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#e5e7eb" strokeWidth="0.5" />
+                </pattern>
+              </defs>
+              <rect width="100" height="100" fill="url(#grid)" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="relative container mx-auto px-4 py-20">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Rochester Badge */}
+            <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-blue-100">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-gray-700">Live in Rochester, NY</span>
+              <div className="flex space-x-1">
+                <div className="w-1 h-1 bg-orange-400 rounded-full"></div>
+                <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
+                <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
+              </div>
+            </div>
+
+            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Your Next Career
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-orange-500 bg-clip-text text-transparent">
+                Blooms Here
+              </span>
+            </h2>
+
+            <p className="text-xl text-gray-600 mb-4 max-w-2xl mx-auto leading-relaxed">
+              From tech startups to established giants, discover opportunities that match your ambitions in
+              <span className="font-semibold text-gray-800"> Rochester's thriving job market</span>.
+            </p>
+
+            {/* Stats */}
+            <div className="flex justify-center space-x-8 mb-12">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">500+</div>
+                <div className="text-sm text-gray-500">Active Jobs</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">150+</div>
+                <div className="text-sm text-gray-500">Companies</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-500">2.5k+</div>
+                <div className="text-sm text-gray-500">Job Seekers</div>
+              </div>
+            </div>
+
+            {/* Enhanced Search Bar */}
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-2">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+                  <div className="md:col-span-5 relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Input
+                      placeholder="Search jobs, companies, or skills..."
+                      className="pl-12 h-12 border-0 text-base placeholder:text-gray-400 focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="md:col-span-4 relative">
+                    <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Input
+                      placeholder="Rochester, NY"
+                      className="pl-12 h-12 border-0 text-base placeholder:text-gray-400 focus-visible:ring-0"
+                      defaultValue="Rochester, NY"
+                    />
+                  </div>
+                  <div className="md:col-span-3">
+                    <Button className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-base font-semibold rounded-xl">
+                      Find Jobs
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Popular Searches */}
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <span className="text-sm text-gray-500">Popular:</span>
+                {["Software Engineer", "Nurse", "Marketing", "Data Analyst", "Remote"].map((term) => (
+                  <button
+                    key={term}
+                    className="text-sm bg-white/60 hover:bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-700 hover:text-blue-600 transition-colors"
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Floating Elements */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-100 rounded-full opacity-60 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-purple-100 rounded-full opacity-40 animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-orange-100 rounded-full opacity-50 animate-pulse delay-500"></div>
+      </section>
+
+      {/* Filters and Job Listings */}
+      <main className="container mx-auto px-4 py-12">
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Job Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="full-time">Full-time</SelectItem>
+              <SelectItem value="part-time">Part-time</SelectItem>
+              <SelectItem value="contract">Contract</SelectItem>
+              <SelectItem value="internship">Internship</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Industry" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="technology">Technology</SelectItem>
+              <SelectItem value="healthcare">Healthcare</SelectItem>
+              <SelectItem value="finance">Finance</SelectItem>
+              <SelectItem value="education">Education</SelectItem>
+              <SelectItem value="retail">Retail</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Salary Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0-50k">$0 - $50,000</SelectItem>
+              <SelectItem value="50k-75k">$50,000 - $75,000</SelectItem>
+              <SelectItem value="75k-100k">$75,000 - $100,000</SelectItem>
+              <SelectItem value="100k+">$100,000+</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Results Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-2xl font-semibold text-gray-900">{jobs.length} Jobs in Rochester, NY</h3>
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" defaultValue="newest" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest First</SelectItem>
+              <SelectItem value="salary-high">Salary: High to Low</SelectItem>
+              <SelectItem value="salary-low">Salary: Low to High</SelectItem>
+              <SelectItem value="company">Company A-Z</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Job Listings */}
+        <div className="grid gap-6">
+          {jobs.map((job) => (
+            <Card key={job.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={job.logo || "/placeholder.svg"}
+                      alt={`${job.company} logo`}
+                      className="w-12 h-12 rounded-lg object-cover"
+                    />
+                    <div>
+                      <CardTitle className="text-xl text-gray-900 hover:text-blue-600 transition-colors">
+                        {job.title}
+                      </CardTitle>
+                      <CardDescription className="text-lg font-medium text-gray-700">{job.company}</CardDescription>
+                    </div>
+                  </div>
+                  <Badge variant="secondary" className="text-sm">
+                    {job.type}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">{job.description}</p>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {job.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    {job.location}
+                  </div>
+                  <div className="flex items-center">
+                    <DollarSign className="h-4 w-4 mr-1" />
+                    {job.salary}
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 mr-1" />
+                    {job.posted}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Load More */}
+        <div className="text-center mt-12">
+          <Button variant="outline" size="lg">
+            Load More Jobs
+          </Button>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t mt-16">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <Building2 className="h-6 w-6 text-blue-600" />
+                <span className="text-xl font-bold">RocJobs</span>
+              </div>
+              <p className="text-gray-600">Connecting talent with opportunity in Rochester, NY.</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">For Job Seekers</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Browse Jobs
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Career Advice
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Resume Builder
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Salary Guide
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">For Employers</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Post a Job
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Browse Resumes
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Employer Resources
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">About Rochester</h4>
+              <ul className="space-y-2 text-gray-600">
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Living in Rochester
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Top Employers
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Industry Insights
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-900">
+                    Local Events
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t pt-8 mt-8 text-center text-gray-600">
+            <p>&copy; 2024 RocJobs. All rights reserved. | Privacy Policy | Terms of Service</p>
+          </div>
+        </div>
       </footer>
     </div>
-  );
+  )
 }
