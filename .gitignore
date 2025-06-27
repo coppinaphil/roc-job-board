@@ -34,6 +34,19 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# job board specific
+/data/
+/scripts/debug-*
+/scripts/quick-*
+/scripts/clear-jobs.js
+/scripts/check-current-jobs.js
+processed_jobs*.json
+*.log
+
+# AI processing
+ollama.log
+processing.log
+
 # vercel
 .vercel
 

@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Link from 'next/link'
+import { supabase } from "@/lib/supabase"
 
 export const metadata: Metadata = {
   title: "Rochester NY Jobs | Find Local Employment Opportunities",
@@ -18,83 +20,70 @@ export const metadata: Metadata = {
   },
 }
 
-// Sample job data - in a real app, this would come from a database
-const jobs = [
-  {
-    id: 1,
-    title: "Senior Software Engineer",
-    company: "Xerox Corporation",
-    location: "Rochester, NY",
-    type: "Full-time",
-    salary: "$85,000 - $120,000",
-    posted: "2 days ago",
-    description: "Join our innovative team developing next-generation printing solutions.",
-    tags: ["JavaScript", "React", "Node.js"],
-    logo: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 2,
-    title: "Marketing Manager",
-    company: "Wegmans Food Markets",
-    location: "Rochester, NY",
-    type: "Full-time",
-    salary: "$65,000 - $85,000",
-    posted: "1 day ago",
-    description: "Lead marketing initiatives for our flagship Rochester locations.",
-    tags: ["Marketing", "Digital Marketing", "Analytics"],
-    logo: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 3,
-    title: "Registered Nurse",
-    company: "Rochester Regional Health",
-    location: "Rochester, NY",
-    type: "Full-time",
-    salary: "$70,000 - $90,000",
-    posted: "3 days ago",
-    description: "Provide exceptional patient care in our state-of-the-art facilities.",
-    tags: ["Healthcare", "Nursing", "Patient Care"],
-    logo: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 4,
-    title: "Data Analyst",
-    company: "University of Rochester",
-    location: "Rochester, NY",
-    type: "Full-time",
-    salary: "$55,000 - $75,000",
-    posted: "4 days ago",
-    description: "Analyze research data and support academic initiatives.",
-    tags: ["Data Analysis", "SQL", "Python"],
-    logo: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 5,
-    title: "Financial Advisor",
-    company: "ESL Federal Credit Union",
-    location: "Rochester, NY",
-    type: "Full-time",
-    salary: "$50,000 - $80,000",
-    posted: "5 days ago",
-    description: "Help members achieve their financial goals with personalized advice.",
-    tags: ["Finance", "Customer Service", "Sales"],
-    logo: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 6,
-    title: "UX Designer",
-    company: "ImageFirst",
-    location: "Rochester, NY",
-    type: "Contract",
-    salary: "$60,000 - $85,000",
-    posted: "1 week ago",
-    description: "Design intuitive user experiences for our digital platforms.",
-    tags: ["UX Design", "Figma", "User Research"],
-    logo: "/placeholder.svg?height=40&width=40",
-  },
-]
+// Helper function to format salary
+function formatSalary(job: any) {
+  if (!job.salary_min && !job.salary_max) return "Salary not specified"
+  
+  const formatAmount = (amount: number) => {
+    if (job.salary_period === 'hourly') {
+      return `$${amount}/hr`
+    }
+    return `$${amount.toLocaleString()}`
+  }
+  
+  if (job.salary_min && job.salary_max) {
+    return `${formatAmount(job.salary_min)} - ${formatAmount(job.salary_max)}`
+  } else if (job.salary_min) {
+    return `${formatAmount(job.salary_min)}+`
+  } else if (job.salary_max) {
+    return `Up to ${formatAmount(job.salary_max)}`
+  }
+  
+  return "Salary not specified"
+}
 
-export default function HomePage() {
+// Helper function to format posted date
+function formatPostedDate(dateString: string) {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 0) return "Today"
+  if (diffDays === 1) return "Yesterday"
+  if (diffDays < 7) return `${diffDays} days ago`
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`
+  return `${Math.floor(diffDays / 365)} years ago`
+}
+
+// Server component to fetch jobs
+async function getJobs() {
+  const { data: jobs, error } = await supabase
+    .from('jobs')
+    .select(`
+      *,
+      companies (
+        name,
+        logo_url,
+        verified
+      )
+    `)
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+    .limit(20)
+
+  if (error) {
+    console.error('Error fetching jobs:', error)
+    return []
+  }
+
+  return jobs || []
+}
+
+export default async function HomePage() {
+  const jobs = await getJobs()
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -180,19 +169,19 @@ export default function HomePage() {
               <span className="font-semibold text-gray-800"> Rochester's thriving job market</span>.
             </p>
 
-            {/* Stats */}
+            {/* Dynamic Stats */}
             <div className="flex justify-center space-x-8 mb-12">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">500+</div>
+                <div className="text-2xl font-bold text-blue-600">{jobs.length}+</div>
                 <div className="text-sm text-gray-500">Active Jobs</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">150+</div>
+                <div className="text-2xl font-bold text-purple-600">{new Set(jobs.map(job => job.company)).size}+</div>
                 <div className="text-sm text-gray-500">Companies</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-500">2.5k+</div>
-                <div className="text-sm text-gray-500">Job Seekers</div>
+                <div className="text-2xl font-bold text-orange-500">{jobs.filter(job => job.ai_enhanced).length}</div>
+                <div className="text-sm text-gray-500">AI Enhanced</div>
               </div>
             </div>
 
@@ -223,15 +212,15 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Popular Searches */}
+              {/* Popular Skills from Real Data */}
               <div className="mt-6 flex flex-wrap justify-center gap-2">
                 <span className="text-sm text-gray-500">Popular:</span>
-                {["Software Engineer", "Nurse", "Marketing", "Data Analyst", "Remote"].map((term) => (
+                {Array.from(new Set(jobs.flatMap(job => job.skills_required || []))).slice(0, 5).map((skill) => (
                   <button
-                    key={term}
-                    className="text-sm bg-white/60 hover:bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-700 hover:text-blue-600 transition-colors"
+                    key={skill}
+                    className="text-sm bg-white/60 hover:bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-700 hover:text-blue-600 transition-colors capitalize"
                   >
-                    {term}
+                    {skill}
                   </button>
                 ))}
               </div>
@@ -251,6 +240,18 @@ export default function HomePage() {
         <div className="flex flex-wrap gap-4 mb-8">
           <Select>
             <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Location" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Rochester Area</SelectItem>
+              {Array.from(new Set(jobs.map(job => job.suburb).filter(Boolean))).sort().map((suburb) => (
+                <SelectItem key={suburb} value={suburb!}>{suburb}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select>
+            <SelectTrigger className="w-[180px]">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Job Type" />
             </SelectTrigger>
@@ -267,23 +268,21 @@ export default function HomePage() {
               <SelectValue placeholder="Industry" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="technology">Technology</SelectItem>
-              <SelectItem value="healthcare">Healthcare</SelectItem>
-              <SelectItem value="finance">Finance</SelectItem>
-              <SelectItem value="education">Education</SelectItem>
-              <SelectItem value="retail">Retail</SelectItem>
+              {Array.from(new Set(jobs.map(job => job.industry).filter(Boolean))).map((industry) => (
+                <SelectItem key={industry} value={industry!}>{industry}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
           <Select>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Salary Range" />
+              <SelectValue placeholder="Experience" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0-50k">$0 - $50,000</SelectItem>
-              <SelectItem value="50k-75k">$50,000 - $75,000</SelectItem>
-              <SelectItem value="75k-100k">$75,000 - $100,000</SelectItem>
-              <SelectItem value="100k+">$100,000+</SelectItem>
+              <SelectItem value="entry">Entry Level</SelectItem>
+              <SelectItem value="mid">Mid Level</SelectItem>
+              <SelectItem value="senior">Senior Level</SelectItem>
+              <SelectItem value="executive">Executive</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -291,79 +290,128 @@ export default function HomePage() {
         {/* Results Header */}
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-semibold text-gray-900">{jobs.length} Jobs in Rochester, NY</h3>
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" defaultValue="newest" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest First</SelectItem>
-              <SelectItem value="salary-high">Salary: High to Low</SelectItem>
-              <SelectItem value="salary-low">Salary: Low to High</SelectItem>
-              <SelectItem value="company">Company A-Z</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            {jobs.filter(job => job.ai_enhanced).length > 0 && (
+              <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                🤖 AI Enhanced
+              </Badge>
+            )}
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" defaultValue="newest" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="quality">Quality Score</SelectItem>
+                <SelectItem value="salary-high">Salary: High to Low</SelectItem>
+                <SelectItem value="company">Company A-Z</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Job Listings */}
         <div className="grid gap-6">
-          {jobs.map((job) => (
-            <Card key={job.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={job.logo || "/placeholder.svg"}
-                      alt={`${job.company} logo`}
-                      className="w-12 h-12 rounded-lg object-cover"
-                    />
-                    <div>
-                      <CardTitle className="text-xl text-gray-900 hover:text-blue-600 transition-colors">
-                        {job.title}
-                      </CardTitle>
-                      <CardDescription className="text-lg font-medium text-gray-700">{job.company}</CardDescription>
+          {jobs.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No jobs found. Run the batch processor to add jobs!</p>
+              <Button className="mt-4" onClick={() => window.location.href = '/admin'}>
+                Add Jobs
+              </Button>
+            </div>
+          ) : (
+            jobs.map((job) => (
+              <Link key={job.id} href={`/jobs/${job.id}`}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                          <span className="text-blue-600 font-semibold text-lg">
+                            {job.companies?.name?.[0] || job.company[0]}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-xl text-gray-900 hover:text-blue-600 transition-colors">
+                              {job.title}
+                            </CardTitle>
+                            {job.ai_enhanced && (
+                              <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                                🤖 AI Enhanced
+                              </Badge>
+                            )}
+                            {job.quality_score && job.quality_score >= 8 && (
+                              <Badge variant="outline" className="text-xs bg-green-50 border-green-200 text-green-700">
+                                ⭐ High Quality
+                              </Badge>
+                            )}
+                          </div>
+                          <CardDescription className="text-lg font-medium text-gray-700">
+                            {job.companies?.name || job.company}
+                          </CardDescription>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="text-sm capitalize">
+                        {job.employment_type}
+                      </Badge>
                     </div>
-                  </div>
-                  <Badge variant="secondary" className="text-sm">
-                    {job.type}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">{job.description}</p>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 mb-4 line-clamp-2">
+                      {job.summary || job.description?.substring(0, 120) + '...' || 'No description available'}
+                    </p>
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {job.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
+                    {/* Skills Tags */}
+                    {job.skills_required && job.skills_required.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {job.skills_required.slice(0, 6).map((skill: string, index: number) => (
+                          <Badge key={index} variant="outline" className="text-xs capitalize">
+                            {skill}
+                          </Badge>
+                        ))}
+                        {job.skills_required.length > 6 && (
+                          <Badge variant="outline" className="text-xs text-gray-500">
+                            +{job.skills_required.length - 6} more
+                          </Badge>
+                        )}
+                      </div>
+                    )}
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {job.location}
-                  </div>
-                  <div className="flex items-center">
-                    <DollarSign className="h-4 w-4 mr-1" />
-                    {job.salary}
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {job.posted}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        {job.suburb && job.suburb !== 'Rochester' ? `${job.suburb}, NY` : job.location}
+                      </div>
+                      <div className="flex items-center">
+                        <DollarSign className="h-4 w-4 mr-1" />
+                        {formatSalary(job)}
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1" />
+                        {formatPostedDate(job.published_at || job.created_at)}
+                      </div>
+                      {job.remote_ok && (
+                        <Badge variant="outline" className="text-xs bg-green-50 border-green-200 text-green-700">
+                          🏠 Remote OK
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))
+          )}
         </div>
 
         {/* Load More */}
-        <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
-            Load More Jobs
-          </Button>
-        </div>
+        {jobs.length > 0 && (
+          <div className="text-center mt-12">
+            <Button variant="outline" size="lg">
+              Load More Jobs
+            </Button>
+          </div>
+        )}
       </main>
 
       {/* Footer */}
