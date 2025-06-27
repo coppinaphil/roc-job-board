@@ -67,14 +67,11 @@ async function getJob(id: string) {
   return job
 }
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
+type Props = {
+  params: { id: string }
 }
 
-export default async function JobDetailPage({ params }: PageProps) {
+export default async function JobDetailPage({ params }: Props) {
   const job = await getJob(params.id)
 
   if (!job) {
