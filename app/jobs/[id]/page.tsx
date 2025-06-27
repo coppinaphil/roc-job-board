@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { MapPin, Building2, Clock, User, ArrowLeft, ExternalLink } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import Link from 'next/link'
+import { Metadata } from 'next'
 
 // Helper function to format salary
 function formatSalary(job: { salary_min?: number; salary_max?: number; salary_period?: string }) {
@@ -67,16 +68,13 @@ async function getJob(id: string) {
   return job
 }
 
-type Props = {
-  params: { id: string }
-}
-
-export default async function JobDetailPage({ params }: Props) {
+export default async function JobDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const job = await getJob(params.id)
-
-  if (!job) {
-    notFound()
-  }
+  if (!job) notFound()
 
   return (
     <div className="min-h-screen bg-background">
