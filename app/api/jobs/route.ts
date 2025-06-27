@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     // Apply pagination
     query = query.range(offset, offset + limit - 1)
     
-    const { data: jobs, error, count } = await query
+    const { data: jobs, error } = await query
     
     if (error) {
       console.error('Database error:', error)
@@ -105,6 +105,8 @@ export async function GET(request: NextRequest) {
       .from('jobs')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published')
+    
+    console.log('Total jobs count:', totalCount)
     
     return NextResponse.json({
       jobs: jobs || [],

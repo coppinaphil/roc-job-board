@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 }
 
 // Helper function to format salary
-function formatSalary(job: any) {
+function formatSalary(job: { salary_min?: number; salary_max?: number; salary_period?: string }) {
   if (!job.salary_min && !job.salary_max) return "Salary not specified"
   
   const formatAmount = (amount: number) => {
@@ -103,7 +103,7 @@ export default async function HomePage() {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   RocJobs
                 </h1>
-                <p className="text-sm text-gray-500 font-medium">The Flower City's Job Hub</p>
+                <p className="text-sm text-gray-500 font-medium">The Flower City&apos;s Job Hub</p>
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
@@ -166,7 +166,7 @@ export default async function HomePage() {
 
             <p className="text-xl text-gray-600 mb-4 max-w-2xl mx-auto leading-relaxed">
               From tech startups to established giants, discover opportunities that match your ambitions in
-              <span className="font-semibold text-gray-800"> Rochester's thriving job market</span>.
+              <span className="font-semibold text-gray-800"> Rochester&apos;s thriving job market</span>.
             </p>
 
             {/* Dynamic Stats */}
@@ -213,17 +213,19 @@ export default async function HomePage() {
               </div>
 
               {/* Popular Skills from Real Data */}
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
-                <span className="text-sm text-gray-500">Popular:</span>
-                {Array.from(new Set(jobs.flatMap(job => job.skills_required || []))).slice(0, 5).map((skill) => (
-                  <button
-                    key={skill}
-                    className="text-sm bg-white/60 hover:bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-700 hover:text-blue-600 transition-colors capitalize"
-                  >
-                    {skill}
-                  </button>
-                ))}
-              </div>
+              {Array.from(new Set(jobs.flatMap(job => job.skills_required || []))).length > 0 && (
+                <div className="mt-6 flex flex-wrap justify-center gap-2">
+                  <span className="text-sm text-gray-500">Popular:</span>
+                  {Array.from(new Set(jobs.flatMap(job => job.skills_required || []))).slice(0, 5).map((skill) => (
+                    <div
+                      key={skill}
+                      className="text-sm bg-white/60 hover:bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-700 hover:text-blue-600 transition-colors capitalize cursor-pointer"
+                    >
+                      {skill}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -315,9 +317,11 @@ export default async function HomePage() {
           {jobs.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">No jobs found. Run the batch processor to add jobs!</p>
-              <Button className="mt-4" onClick={() => window.location.href = '/admin'}>
-                Add Jobs
-              </Button>
+              <Link href="/admin">
+                <Button className="mt-4">
+                  Add Jobs
+                </Button>
+              </Link>
             </div>
           ) : (
             jobs.map((job) => (

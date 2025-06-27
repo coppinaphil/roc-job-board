@@ -2,12 +2,12 @@ import { notFound } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MapPin, DollarSign, Clock, Building2, User, ArrowLeft, ExternalLink } from "lucide-react"
+import { MapPin, Building2, Clock, User, ArrowLeft, ExternalLink } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import Link from 'next/link'
 
 // Helper function to format salary
-function formatSalary(job: any) {
+function formatSalary(job: { salary_min?: number; salary_max?: number; salary_period?: string }) {
   if (!job.salary_min && !job.salary_max) return "Salary not specified"
   
   const formatAmount = (amount: number) => {
@@ -91,11 +91,11 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </div>
               <div>
                 <Link href="/">
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-                    RocJobs
-                  </h1>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                RocJobs
+                </h1>
                 </Link>
-                <p className="text-sm text-gray-500 font-medium">The Flower City's Job Hub</p>
+                <p className="text-sm text-gray-500 font-medium">The Flower City&apos;s Job Hub</p>
               </div>
             </div>
             
@@ -262,7 +262,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   </Button>
                   
                   <p className="text-sm text-gray-500 text-center mt-3">
-                    You'll be redirected to the original job posting
+                    You&apos;ll be redirected to the original job posting
                   </p>
                 </CardContent>
               </Card>
