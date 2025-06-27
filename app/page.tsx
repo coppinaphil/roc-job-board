@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from 'next/link'
 import { supabase } from "@/lib/supabase"
 
+
 export const metadata: Metadata = {
   title: "Rochester NY Jobs | Find Local Employment Opportunities",
   description:
@@ -19,6 +20,8 @@ export const metadata: Metadata = {
     type: "website",
   },
 }
+
+
 
 // Helper function to format salary
 function formatSalary(job: { salary_min?: number; salary_max?: number; salary_period?: string }) {
