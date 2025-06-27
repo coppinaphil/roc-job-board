@@ -8,6 +8,32 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from 'next/link'
 import { supabase } from "@/lib/supabase"
 
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  employment_type: string;
+  experience_level?: string;
+  published_at?: string;
+  created_at: string;
+  ai_enhanced?: boolean;
+  quality_score?: number;
+  remote_ok?: boolean;
+  skills_required?: string[];
+  suburb?: string;
+  industry?: string;
+  description?: string;
+  summary?: string;
+  salary_min?: number;
+  salary_max?: number;
+  salary_period?: string;
+  companies?: {
+    name: string;
+    logo_url?: string;
+    verified?: boolean;
+  };
+}
 
 export const metadata: Metadata = {
   title: "Rochester NY Jobs | Find Local Employment Opportunities",
@@ -20,8 +46,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 }
-
-
 
 // Helper function to format salary
 function formatSalary(job: { salary_min?: number; salary_max?: number; salary_period?: string }) {
@@ -61,7 +85,7 @@ function formatPostedDate(dateString: string) {
 }
 
 // Server component to fetch jobs
-async function getJobs() {
+async function getJobs(): Promise<Job[]> {
   const { data: jobs, error } = await supabase
     .from('jobs')
     .select(`
@@ -85,7 +109,7 @@ async function getJobs() {
 }
 
 export default async function HomePage() {
-  const jobs = await getJobs()
+  const jobs: Job[] = await getJobs()
   
   return (
     <div className="min-h-screen bg-background">

@@ -101,21 +101,21 @@ export async function GET(request: NextRequest) {
     }
     
     // Get total count for pagination
-    const { count: totalCount } = await supabase
+    const { count } = await supabase
       .from('jobs')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published')
     
-    console.log('Total jobs count:', totalCount)
+    console.log('Total jobs count:', count)
     
     return NextResponse.json({
       jobs: jobs || [],
       pagination: {
         page,
         limit,
-        total: totalCount || 0,
-        totalPages: Math.ceil((totalCount || 0) / limit),
-        hasNext: page * limit < (totalCount || 0),
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit),
+        hasNext: page * limit < (count || 0),
         hasPrev: page > 1
       },
       filters,
