@@ -67,7 +67,14 @@ async function getJob(id: string) {
   return job
 }
 
-export default async function JobDetailPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export default async function JobDetailPage({ params }: PageProps) {
   const job = await getJob(params.id)
 
   if (!job) {
